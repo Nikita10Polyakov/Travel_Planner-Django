@@ -1,0 +1,228 @@
+openapi: 3.0.0
+info:
+  title: Travel Planner API
+  version: "1.0.0"
+  description: API for managing travel projects and places (generated manually).
+servers:
+  - url: http://localhost:8000
+paths:
+  /api/projects/:
+    get:
+      summary: List travel projects
+      responses:
+        '200':
+          description: A list of projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TravelProject'
+    post:
+      summary: Create a travel project (can include places)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TravelProjectCreate'
+      responses:
+        '201':
+          description: Project created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TravelProject'
+
+  /api/projects/{project_id}/:
+    parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Retrieve a single project
+      responses:
+        '200':
+          description: Project detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TravelProject'
+    put:
+      summary: Replace a project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TravelProjectCreate'
+      responses:
+        '200':
+          description: Updated project
+    patch:
+      summary: Partially update a project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TravelProjectCreate'
+      responses:
+        '200':
+          description: Updated project
+    delete:
+      summary: Delete a project
+      responses:
+        '204':
+          description: Deleted
+
+  /api/projects/{project_id}/places/:
+    parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: List places for a project
+      responses:
+        '200':
+          description: List of places
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectPlace'
+    post:
+      summary: Create a place in project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectPlaceCreate'
+      responses:
+        '201':
+          description: Place created
+
+  /api/projects/{project_id}/places/{place_id}/:
+    parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: place_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Retrieve a place
+      responses:
+        '200':
+          description: Place detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectPlace'
+    put:
+      summary: Replace a place
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectPlaceCreate'
+      responses:
+        '200':
+          description: Updated place
+    patch:
+      summary: Partially update a place
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectPlaceCreate'
+      responses:
+        '200':
+          description: Updated place
+    delete:
+      summary: Delete a place
+      responses:
+        '204':
+          description: Deleted
+
+components:
+  schemas:
+    ProjectPlace:
+      type: object
+      properties:
+        id:
+          type: integer
+        external_id:
+          type: string
+        title:
+          type: string
+        notes:
+          type: string
+        visited:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    ProjectPlaceCreate:
+      type: object
+      properties:
+        external_id:
+          type: string
+        notes:
+          type: string
+        visited:
+          type: boolean
+      required:
+        - external_id
+
+    TravelProject:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        start_date:
+          type: string
+          format: date
+        completed:
+          type: boolean
+        places:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectPlace'
+        created_at:
+          type: string
+          format: date-time
+
+    TravelProjectCreate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        start_date:
+          type: string
+          format: date
+        places:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectPlaceCreate'
+      required:
+        - name
