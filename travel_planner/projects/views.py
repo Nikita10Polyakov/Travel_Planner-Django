@@ -47,3 +47,10 @@ class ProjectPlaceViewSet(viewsets.ModelViewSet):
             if not project.places.filter(visited=False).exists():
                 project.completed = True
                 project.save()
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["project"] = TravelProject.objects.get(
+            id=self.kwargs["project_pk"]
+        )
+        return context
