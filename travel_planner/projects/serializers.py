@@ -45,6 +45,7 @@ class ProjectPlaceSerializer(serializers.ModelSerializer):
         attrs["title"] = title
         return attrs
 
+
 class TravelProjectSerializer(serializers.ModelSerializer):
     places = ProjectPlaceSerializer(many=True, read_only=True)
 
@@ -60,3 +61,27 @@ class TravelProjectSerializer(serializers.ModelSerializer):
             "created_at",
         ]
         read_only_fields = ["id", "completed", "created_at"]
+
+
+class TravelProjectCreateSerializer(serializers.ModelSerializer):
+    places = ProjectPlaceSerializer(many=True, write_only=True, required=False)
+
+    class Meta:
+        model = TravelProject
+        fields = ["id", "name", "description", "start_date", "places"]
+        read_only_fields = ["id"]
+
+    def create(self, validated_data):
+        places_data = validated_data.pop("places", [])
+        project = TravelProject.objects.create(**validated_data)
+
+        for place_data in places_data:
+            external_id = place_data["external_id"]
+            title = validate_place(external_id)
+            if title:
+                ProjectPlace.objects.create(
+                    project=project,
+                    external_id=external_id,
+                    title=title
+                )
+        return project

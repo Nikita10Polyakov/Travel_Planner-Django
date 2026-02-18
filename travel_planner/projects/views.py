@@ -1,12 +1,17 @@
 from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
 from .models import TravelProject, ProjectPlace
-from .serializers import TravelProjectSerializer, ProjectPlaceSerializer
+from .serializers import TravelProjectSerializer, TravelProjectCreateSerializer, ProjectPlaceSerializer
 
 
 class TravelProjectViewSet(viewsets.ModelViewSet):
     queryset = TravelProject.objects.all()
     serializer_class = TravelProjectSerializer
+
+    def get_serializer_class(self):
+        if self.action == "create":
+            return TravelProjectCreateSerializer
+        return TravelProjectSerializer
 
     def destroy(self, request, *args, **kwargs):
         project = self.get_object()
